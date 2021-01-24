@@ -8,14 +8,14 @@ let container: Element;
 beforeEach(() => {
   container = document.createElement("div");
   document.body.appendChild(container);
-})
+});
 
 afterEach(() => {
   if (container) {
     unmountComponentAtNode(container);
     container.remove();
   }
-})
+});
 
 describe("StatusBar", () => {
   it("should show the winner when the winner O is given", () => {
