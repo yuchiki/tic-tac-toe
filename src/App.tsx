@@ -1,26 +1,56 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+enum CellState {
+  emptyState = "",
+  oState = "O",
+  xState = "X"
 }
 
+
+const App: React.FC = () =>
+  <div className="game">
+    <Board />
+    <GameInfo />
+  </div>;
+
+const Board: React.FC = () =>
+  <div>
+    <BoardRow rowState={[CellState.xState, CellState.oState, CellState.emptyState]} />
+    <BoardRow rowState={[CellState.xState, CellState.oState, CellState.emptyState]} />
+    <BoardRow rowState={[CellState.xState, CellState.oState, CellState.emptyState]} />
+  </div>;
+
+const BoardRow: React.FC<{ rowState: CellState[] }> = (props) =>
+  <div>
+    {props.rowState.map(s => <Cell cellState={s} />)}
+  </div>;
+
+const Cell: React.FC<{ cellState: CellState }> = (props) =>
+  <button className="cell" >
+    {props.cellState}
+  </button>;
+
 export default App;
+
+const GameInfo: React.FC = () =>
+  <div className="game-info">
+    <StatusBar />
+    <ul>
+      <MoveNavigator />
+      <MoveNavigator />
+      <MoveNavigator />
+      <MoveNavigator />
+      <MoveNavigator />
+    </ul>
+  </div>
+
+const StatusBar: React.FC = () =>
+  <div>
+    next: O
+</div>
+
+const MoveNavigator: React.FC = () =>
+  <li>
+    3: <button>Go to move #3 </ button>
+  </li>
