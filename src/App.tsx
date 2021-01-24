@@ -9,9 +9,6 @@ enum CellState {
 
 type Player = CellState.stateO | CellState.stateX;
 
-type BoardState = CellState[][];
-
-
 const App: React.FC = () => {
   const initialBoardState = [
     [CellState.emptyState, CellState.emptyState, CellState.emptyState],
@@ -55,10 +52,12 @@ const App: React.FC = () => {
 }
 
 const Board: React.FC<{ boardState: CellState[][], updater: (row: number, column: number) => void }> = props =>
-  <div>
-    <BoardRow rowState={props.boardState[0]} row={0} updater={props.updater} />
-    <BoardRow rowState={props.boardState[1]} row={1} updater={props.updater} />
-    <BoardRow rowState={props.boardState[2]} row={2} updater={props.updater} />
+  <div>{props.boardState.map((row, i) =>
+    <BoardRow
+      rowState={row}
+      row={i}
+      updater={props.updater}
+    />)}
   </div>;
 
 const BoardRow: React.FC<{ rowState: CellState[], row: number, updater: (row: number, column: number) => void }> = props =>
@@ -109,7 +108,8 @@ const StatusBar: React.FC<{ currentPlayer: Player, winner: CellState }> = props 
 
 const MoveNavigator: React.FC<{ index: number, setIndex: (index: number) => void }> = (props) =>
   <li>
-    {props.index} : <button onClick={_ => props.setIndex(props.index)}>
+    {props.index}
+    : <button onClick={_ => props.setIndex(props.index)}>
       Go to {props.index === 0 ? "initial state" : `move #${props.index}`}
     </ button>
   </li>
