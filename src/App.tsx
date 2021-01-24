@@ -9,6 +9,8 @@ enum CellState {
 
 type Player = CellState.stateO | CellState.stateX;
 
+type BoardState = CellState[][];
+
 
 const App: React.FC = () => {
   const initialBoardState = [
@@ -17,30 +19,37 @@ const App: React.FC = () => {
     [CellState.emptyState, CellState.emptyState, CellState.emptyState]
   ];
 
-  const [boardState, setBoardState] = useState(initialBoardState);
+  const [history, setHistory] = useState([initialBoardState]);
   const [currentPlayer, setCurrentPlayer] = useState<Player>(CellState.stateO);
+  const [currentMoveIndex, setCurrentMoveIndex] = useState(0);
 
   const updater = (row: number, column: number) => {
-    const copiedBoardState = [
-      [...boardState[0]],
-      [...boardState[1]],
-      [...boardState[2]]
+    const currentBoard = history[currentMoveIndex];
+    const nextBoardState = [
+      [...currentBoard[0]],
+      [...currentBoard[1]],
+      [...currentBoard[2]]
     ];
-    copiedBoardState[row][column] = currentPlayer;
-    setBoardState(copiedBoardState);
-    setCurrentPlayer(flipPlayer(currentPlayer))
+    nextBoardState[row][column] = currentPlayer;
+
+    const newHistory = [...history.slice(0, currentMoveIndex + 1), nextBoardState];
+    setHistory(newHistory);
+    setCurrentPlayer(flipPlayer(currentPlayer));
+    setCurrentMoveIndex(currentMoveIndex + 1);
   }
 
-  const winner = winnerOf(boardState);
+  const winner = winnerOf(history[currentMoveIndex]);
 
   return <div className="game">
     <Board
-      boardState={boardState}
+      boardState={history[currentMoveIndex]}
       updater={winner !== CellState.emptyState ? () => { } : updater}
     />
     <GameInfo
       currentPlayer={currentPlayer}
       winner={winner}
+      historyLength={history.length}
+      setIndex={setCurrentMoveIndex}
     />
   </div>;
 }
@@ -78,18 +87,18 @@ const Cell: React.FC<{ cellState: CellState, row: number, column: number, update
 
 export default App;
 
-const GameInfo: React.FC<{ currentPlayer: Player, winner: CellState }> = props =>
+const GameInfo: React.FC<{ currentPlayer: Player, winner: CellState, historyLength: number, setIndex: (index: number) => void }> = props =>
   <div className="game-info">
     <StatusBar
       currentPlayer={props.currentPlayer}
       winner={props.winner}
     />
     <ul>
-      <MoveNavigator />
-      <MoveNavigator />
-      <MoveNavigator />
-      <MoveNavigator />
-      <MoveNavigator />
+      {Array.from({ length: props.historyLength }).map((_, i) =>
+        <MoveNavigator
+          index={i}
+          setIndex={props.setIndex}
+        />)}
     </ul>
   </div>;
 
@@ -98,9 +107,11 @@ const StatusBar: React.FC<{ currentPlayer: Player, winner: CellState }> = props 
     <div>next: {props.currentPlayer}</div> :
     <div>winner: {props.winner}</div>
 
-const MoveNavigator: React.FC = () =>
+const MoveNavigator: React.FC<{ index: number, setIndex: (index: number) => void }> = (props) =>
   <li>
-    3: <button>Go to move #3 </ button>
+    {props.index} : <button onClick={_ => props.setIndex(props.index)}>
+      Go to {props.index === 0 ? "initial state" : `move #${props.index}`}
+    </ button>
   </li>
 
 const flipPlayer = (player: Player): Player =>
